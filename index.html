@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>美淇我❤️你</title>
+  <title>Gift Effect Band Version + Music</title>
   <style>
     * {
       margin: 0;
@@ -20,23 +20,8 @@
       font-family: Arial, sans-serif;
     }
 
-    #app {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-      overflow: hidden;
-      background: radial-gradient(circle at center, rgba(24,24,24,1) 0%, rgba(0,0,0,1) 68%);
-    }
-
-    #scene {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      transform: rotate(0deg);
-      transform-origin: center center;
-      transition: transform 1.35s cubic-bezier(0.22, 1, 0.36, 1);
-      will-change: transform;
+    body {
+      background: radial-gradient(circle at center, rgba(26, 26, 38, 1) 0%, rgba(0, 0, 0, 1) 68%);
     }
 
     canvas {
@@ -46,357 +31,251 @@
     }
 
     .controls {
-      position: absolute;
+      position: fixed;
       left: 50%;
-      bottom: 28px;
+      bottom: 26px;
       transform: translateX(-50%);
       z-index: 20;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      pointer-events: none;
     }
 
-    .rotate-btn {
-      pointer-events: auto;
-      position: relative;
-      overflow: hidden;
-      border: 1px solid rgba(255,255,255,0.22);
-      background: linear-gradient(135deg, rgba(255,255,255,0.14), rgba(255,90,130,0.18));
+    .btn {
+      border: 1px solid rgba(255,255,255,0.18);
+      background: linear-gradient(135deg, rgba(255,95,140,0.95), rgba(255,195,70,0.95));
       color: #fff;
-      padding: 13px 22px;
+      padding: 13px 20px;
       border-radius: 999px;
       font-size: 15px;
-      letter-spacing: 0.5px;
       cursor: pointer;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
       box-shadow:
         0 8px 30px rgba(0,0,0,0.35),
-        0 0 18px rgba(255,255,255,0.10),
-        0 0 22px rgba(255,80,120,0.14);
-      transition:
-        transform 0.22s ease,
-        box-shadow 0.22s ease,
-        border-color 0.22s ease,
-        background 0.22s ease;
-      user-select: none;
+        0 0 20px rgba(255,120,120,0.25);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
-    .rotate-btn::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        120deg,
-        rgba(255,255,255,0) 0%,
-        rgba(255,255,255,0.18) 35%,
-        rgba(255,255,255,0.02) 55%,
-        rgba(255,255,255,0) 100%
-      );
-      transform: translateX(-130%);
-      transition: transform 0.7s ease;
-    }
-
-    .rotate-btn:hover::before {
-      transform: translateX(130%);
-    }
-
-    .rotate-btn:hover {
-      transform: translateY(-2px) scale(1.04);
-      border-color: rgba(255,255,255,0.38);
+    .btn:hover {
+      transform: scale(1.04);
       box-shadow:
-        0 10px 36px rgba(0,0,0,0.42),
-        0 0 22px rgba(255,255,255,0.16),
-        0 0 28px rgba(255,80,120,0.24);
+        0 10px 34px rgba(0,0,0,0.42),
+        0 0 28px rgba(255,180,100,0.35);
     }
 
-    .rotate-btn:active {
-      transform: scale(0.96);
+    .btn:active {
+      transform: scale(0.97);
     }
 
-    .rotate-btn .btn-inner {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .rotate-btn .icon {
-      font-size: 16px;
-      display: inline-block;
-      transition: transform 0.4s ease;
-    }
-
-    .rotate-btn.spinning .icon {
-      transform: rotate(360deg);
-    }
-
-    .hint {
-      position: absolute;
-      top: -34px;
+    .label {
+      position: fixed;
+      top: 8%;
       left: 50%;
       transform: translateX(-50%);
-      color: rgba(255,255,255,0.78);
-      font-size: 12px;
-      letter-spacing: 0.4px;
-      white-space: nowrap;
+      z-index: 15;
+      color: white;
+      font-size: clamp(24px, 5vw, 54px);
+      font-weight: bold;
+      letter-spacing: 1px;
+      opacity: 0;
+      transition: opacity 0.45s ease;
+      text-shadow:
+        0 0 12px rgba(255,255,255,0.28),
+        0 0 22px rgba(255,180,80,0.25);
       pointer-events: none;
-      text-shadow: 0 0 12px rgba(255,255,255,0.12);
+      white-space: nowrap;
     }
 
-    @media (max-width: 768px) {
-      .controls {
-        bottom: 22px;
-      }
-
-      .rotate-btn {
-        font-size: 14px;
-        padding: 12px 18px;
-      }
-
-      .rotate-btn .icon {
-        font-size: 15px;
-      }
-
-      .hint {
-        font-size: 11px;
-        top: -30px;
-      }
+    .flash {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle, rgba(255,220,140,0.35), rgba(255,255,255,0) 60%);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 10;
+      transition: opacity 0.2s ease;
     }
   </style>
 </head>
 <body>
-  <div id="app">
-    <div id="scene">
-      <canvas id="canvas"></canvas>
-    </div>
+  <canvas id="canvas"></canvas>
+  <div class="flash" id="flash"></div>
+  <div class="label" id="label">TTU</div>
 
-    <div class="controls">
-      <div class="hint">点一下，转一圈 ✨</div>
-      <button class="rotate-btn" id="rotateBtn">
-        <span class="btn-inner">
-          <span class="icon">↻</span>
-          <span>Rotate 360°</span>
-        </span>
-      </button>
-    </div>
+  <div class="controls">
+    <button class="btn" id="triggerBtn">✨ 触发礼物特效</button>
   </div>
 
+  <!-- 音乐 -->
+  <audio id="bgMusic" preload="auto" src="tiktok%20universo.mp3"></audio>
+
   <script>
-    const scene = document.getElementById("scene");
-    const rotateBtn = document.getElementById("rotateBtn");
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d");
+    const triggerBtn = document.getElementById("triggerBtn");
+    const label = document.getElementById("label");
+    const flash = document.getElementById("flash");
+    const bgMusic = document.getElementById("bgMusic");
 
     let w = canvas.width = window.innerWidth;
     let h = canvas.height = window.innerHeight;
 
-    let textParticles = [];
     let bgParticles = [];
-    let heartParticles = [];
-    let currentRotation = 0;
+    let sparks = [];
+    let rocketTrail = [];
+    let confetti = [];
 
-    const mouse = {
-      x: -9999,
-      y: -9999,
-      radius: 110
+    let effectState = "idle";
+    let stateStart = 0;
+
+    const rocket = {
+      active: false,
+      x: w / 2,
+      y: h + 120,
+      vy: -8.8,
+      scale: 1
     };
 
-    rotateBtn.addEventListener("click", () => {
-      currentRotation += 360;
-      scene.style.transform = `rotate(${currentRotation}deg)`;
+    const stage = {
+      active: false,
+      t: 0,
+      centerX: () => w / 2,
+      centerY: () => h * 0.67
+    };
 
-      rotateBtn.classList.remove("spinning");
-      void rotateBtn.offsetWidth;
-      rotateBtn.classList.add("spinning");
-
-      setTimeout(() => {
-        rotateBtn.classList.remove("spinning");
-      }, 450);
-    });
-
-    class TextParticle {
-      constructor(x, y, color = "white", size = 1.8) {
-        this.baseX = x;
-        this.baseY = y;
-        this.x = Math.random() * w;
-        this.y = Math.random() * h;
-        this.vx = 0;
-        this.vy = 0;
-        this.size = size + Math.random() * 1.4;
-        this.color = color;
-        this.offset = Math.random() * Math.PI * 2;
-      }
-
-      update(time) {
-        const dxMouse = this.x - mouse.x;
-        const dyMouse = this.y - mouse.y;
-        const distMouse = Math.sqrt(dxMouse * dxMouse + dyMouse * dyMouse);
-
-        if (distMouse < mouse.radius) {
-          const force = (mouse.radius - distMouse) / mouse.radius;
-          const angle = Math.atan2(dyMouse, dxMouse);
-          this.vx += Math.cos(angle) * force * 2.6;
-          this.vy += Math.sin(angle) * force * 2.6;
-        }
-
-        const floatX = Math.sin(time * 0.0018 + this.offset) * 1.2;
-        const floatY = Math.cos(time * 0.0018 + this.offset) * 1.2;
-
-        const targetX = this.baseX + floatX;
-        const targetY = this.baseY + floatY;
-
-        this.vx += (targetX - this.x) * 0.05;
-        this.vy += (targetY - this.y) * 0.05;
-
-        this.vx *= 0.83;
-        this.vy *= 0.83;
-
-        this.x += this.vx;
-        this.y += this.vy;
-      }
-
-      draw() {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-
-        if (this.color === "heart") {
-          ctx.fillStyle = "rgba(255, 70, 110, 0.96)";
-          ctx.shadowColor = "rgba(255, 70, 110, 0.95)";
-          ctx.shadowBlur = 13;
-        } else {
-          ctx.fillStyle = "rgba(255,255,255,0.96)";
-          ctx.shadowColor = "rgba(255,255,255,0.82)";
-          ctx.shadowBlur = 8;
-        }
-
-        ctx.fill();
-        ctx.shadowBlur = 0;
-      }
-    }
+    const earth = {
+      angle: 0
+    };
 
     class BgParticle {
       constructor() {
-        this.reset();
-        this.x = Math.random() * w;
-        this.y = Math.random() * h;
+        this.reset(true);
       }
 
-      reset() {
+      reset(initial = false) {
         this.x = Math.random() * w;
         this.y = Math.random() * h;
-        this.vx = (Math.random() - 0.5) * 0.72;
-        this.vy = (Math.random() - 0.5) * 0.72;
-        this.size = Math.random() * 2 + 0.6;
+        this.vx = (Math.random() - 0.5) * 0.5;
+        this.vy = (Math.random() - 0.5) * 0.5;
+        this.size = 0.8 + Math.random() * 2.2;
+        this.alpha = 0.35 + Math.random() * 0.45;
+        if (!initial) this.y = h + 20;
       }
 
       update() {
         this.x += this.vx;
         this.y += this.vy;
 
-        if (this.x <= 0 || this.x >= w) this.vx *= -1;
-        if (this.y <= 0 || this.y >= h) this.vy *= -1;
+        if (this.x < 0 || this.x > w) this.vx *= -1;
+        if (this.y < 0 || this.y > h) this.vy *= -1;
       }
 
       draw() {
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(255,255,255,0.74)";
+        ctx.fillStyle = `rgba(255,255,255,${this.alpha})`;
         ctx.fill();
       }
     }
 
-    function resizeCanvas() {
-      w = canvas.width = window.innerWidth;
-      h = canvas.height = window.innerHeight;
-      init();
-    }
-
-    function buildTextParticles() {
-      textParticles = [];
-      heartParticles = [];
-
-      const offCanvas = document.createElement("canvas");
-      const offCtx = offCanvas.getContext("2d");
-      offCanvas.width = w;
-      offCanvas.height = h;
-
-      let fontSize = Math.min(w / 7, 120);
-      if (w < 768) fontSize = Math.min(w / 5.8, 68);
-
-      const chars = ["美", "淇", "我", "❤", "你"];
-      const charGap = fontSize * 0.92;
-      const totalWidth = charGap * (chars.length - 1);
-      const startX = w / 2 - totalWidth / 2;
-      const centerY = h / 2;
-
-      offCtx.clearRect(0, 0, w, h);
-      offCtx.textAlign = "center";
-      offCtx.textBaseline = "middle";
-      offCtx.font = `bold ${fontSize}px sans-serif`;
-      offCtx.fillStyle = "#fff";
-
-      chars.forEach((char, i) => {
-        const x = startX + i * charGap;
-        offCtx.fillText(char, x, centerY);
-      });
-
-      const imageData = offCtx.getImageData(0, 0, w, h).data;
-      const gap = w < 768 ? 4 : 5;
-
-      for (let y = 0; y < h; y += gap) {
-        for (let x = 0; x < w; x += gap) {
-          const index = (y * w + x) * 4;
-          if (imageData[index + 3] > 128) {
-            textParticles.push(new TextParticle(x, y, "white", 1.8));
-          }
-        }
+    class Spark {
+      constructor(x, y, palette = "gold") {
+        this.x = x;
+        this.y = y;
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 2 + Math.random() * 7;
+        this.vx = Math.cos(angle) * speed;
+        this.vy = Math.sin(angle) * speed;
+        this.life = 50 + Math.random() * 30;
+        this.maxLife = this.life;
+        this.size = 1.5 + Math.random() * 3.2;
+        this.palette = palette;
+        this.gravity = 0.03 + Math.random() * 0.06;
       }
 
-      const heartCanvas = document.createElement("canvas");
-      const heartCtx = heartCanvas.getContext("2d");
-      heartCanvas.width = w;
-      heartCanvas.height = h;
-
-      heartCtx.clearRect(0, 0, w, h);
-      heartCtx.textAlign = "center";
-      heartCtx.textBaseline = "middle";
-      heartCtx.font = `bold ${fontSize}px sans-serif`;
-      heartCtx.fillStyle = "#fff";
-      heartCtx.fillText("❤", startX + 3 * charGap, centerY);
-
-      const heartData = heartCtx.getImageData(0, 0, w, h).data;
-
-      for (let y = 0; y < h; y += gap) {
-        for (let x = 0; x < w; x += gap) {
-          const index = (y * w + x) * 4;
-          if (heartData[index + 3] > 128) {
-            heartParticles.push(new TextParticle(x, y, "heart", 2.0));
-          }
-        }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vy += this.gravity;
+        this.vx *= 0.992;
+        this.life--;
       }
 
-      textParticles = textParticles.filter(p => {
-        for (let i = 0; i < heartParticles.length; i++) {
-          const hp = heartParticles[i];
-          if (Math.abs(p.baseX - hp.baseX) < gap / 2 && Math.abs(p.baseY - hp.baseY) < gap / 2) {
-            return false;
-          }
-        }
-        return true;
-      });
+      draw() {
+        const a = Math.max(this.life / this.maxLife, 0);
+        const color = this.palette === "pink"
+          ? `rgba(255,110,170,${a})`
+          : `rgba(255,210,90,${a})`;
+
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = color;
+        ctx.shadowColor = color;
+        ctx.shadowBlur = 12;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
     }
 
-    function buildBgParticles() {
+    class TrailParticle {
+      constructor(x, y) {
+        this.x = x + (Math.random() - 0.5) * 10;
+        this.y = y;
+        this.vx = (Math.random() - 0.5) * 0.8;
+        this.vy = 1 + Math.random() * 2.8;
+        this.life = 28 + Math.random() * 18;
+        this.maxLife = this.life;
+        this.size = 2 + Math.random() * 3;
+      }
+
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.life--;
+      }
+
+      draw() {
+        const a = Math.max(this.life / this.maxLife, 0);
+        const color = `rgba(255,170,70,${a})`;
+
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = color;
+        ctx.shadowColor = color;
+        ctx.shadowBlur = 14;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+    }
+
+    class Confetti {
+      constructor() {
+        this.x = Math.random() * w;
+        this.y = -20 - Math.random() * h * 0.3;
+        this.vx = (Math.random() - 0.5) * 1.5;
+        this.vy = 1.5 + Math.random() * 2.8;
+        this.size = 2 + Math.random() * 4;
+        this.life = 180 + Math.random() * 80;
+        this.maxLife = this.life;
+        this.type = Math.random() > 0.5 ? "gold" : "pink";
+      }
+
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.life--;
+      }
+
+      draw() {
+        const a = Math.max(this.life / this.maxLife, 0);
+        const c = this.type === "gold"
+          ? `rgba(255,210,90,${a})`
+          : `rgba(255,120,190,${a})`;
+        ctx.fillStyle = c;
+        ctx.fillRect(this.x, this.y, this.size, this.size * 1.6);
+      }
+    }
+
+    function initBgParticles() {
       bgParticles = [];
-      let count = Math.floor((w * h) / 9000);
-      count = Math.max(90, Math.min(count, 180));
-
-      for (let i = 0; i < count; i++) {
-        bgParticles.push(new BgParticle());
-      }
+      const count = Math.max(90, Math.min(180, Math.floor((w * h) / 9000)));
+      for (let i = 0; i < count; i++) bgParticles.push(new BgParticle());
     }
 
     function drawBgConnections() {
@@ -405,13 +284,12 @@
           const dx = bgParticles[i].x - bgParticles[j].x;
           const dy = bgParticles[i].y - bgParticles[j].y;
           const dist = Math.sqrt(dx * dx + dy * dy);
-
-          if (dist < 110) {
-            const alpha = 1 - dist / 110;
+          if (dist < 105) {
+            const a = (1 - dist / 105) * 0.14;
             ctx.beginPath();
             ctx.moveTo(bgParticles[i].x, bgParticles[i].y);
             ctx.lineTo(bgParticles[j].x, bgParticles[j].y);
-            ctx.strokeStyle = `rgba(255,255,255,${alpha * 0.18})`;
+            ctx.strokeStyle = `rgba(255,255,255,${a})`;
             ctx.lineWidth = 1;
             ctx.stroke();
           }
@@ -419,82 +297,447 @@
       }
     }
 
-    function drawTextConnections(particles, maxDist, mode = "white") {
-      for (let i = 0; i < particles.length; i += 3) {
-        for (let j = i + 1; j < particles.length; j += 6) {
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-
-          if (dist < maxDist) {
-            const alpha = 1 - dist / maxDist;
-            ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-
-            if (mode === "heart") {
-              ctx.strokeStyle = `rgba(255,70,110,${alpha * 0.18})`;
-            } else {
-              ctx.strokeStyle = `rgba(255,255,255,${alpha * 0.12})`;
-            }
-
-            ctx.lineWidth = 0.8;
-            ctx.stroke();
-          }
-        }
+    function createBurst(x, y, count = 120) {
+      for (let i = 0; i < count; i++) {
+        sparks.push(new Spark(x, y, Math.random() > 0.45 ? "gold" : "pink"));
       }
     }
 
-    function animate(time = 0) {
-      ctx.fillStyle = "rgba(0,0,0,0.25)";
+    function createRocketExplosion(x, y) {
+      for (let i = 0; i < 220; i++) {
+        sparks.push(new Spark(x, y, Math.random() > 0.3 ? "gold" : "pink"));
+      }
+      for (let i = 0; i < 50; i++) confetti.push(new Confetti());
+    }
+
+    function drawRocket() {
+      if (!rocket.active) return;
+
+      ctx.save();
+      ctx.translate(rocket.x, rocket.y);
+      ctx.scale(rocket.scale, rocket.scale);
+
+      ctx.beginPath();
+      ctx.moveTo(0, 26);
+      ctx.quadraticCurveTo(-8, 40, 0, 54);
+      ctx.quadraticCurveTo(8, 40, 0, 26);
+      ctx.fillStyle = "rgba(255,140,40,0.95)";
+      ctx.shadowColor = "rgba(255,140,40,0.85)";
+      ctx.shadowBlur = 18;
+      ctx.fill();
+
+      ctx.shadowBlur = 0;
+      ctx.beginPath();
+      ctx.moveTo(0, -36);
+      ctx.quadraticCurveTo(16, -20, 14, 18);
+      ctx.lineTo(-14, 18);
+      ctx.quadraticCurveTo(-16, -20, 0, -36);
+      ctx.fillStyle = "rgba(245,245,250,0.98)";
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(0, -30, 10, Math.PI, 0);
+      ctx.fillStyle = "rgba(255,90,120,1)";
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(0, -6, 6, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(120,200,255,0.95)";
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(-14, 12);
+      ctx.lineTo(-24, 24);
+      ctx.lineTo(-10, 22);
+      ctx.closePath();
+      ctx.fillStyle = "rgba(255,90,120,0.95)";
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(14, 12);
+      ctx.lineTo(24, 24);
+      ctx.lineTo(10, 22);
+      ctx.closePath();
+      ctx.fillStyle = "rgba(255,90,120,0.95)";
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function updateRocket() {
+      if (!rocket.active) return;
+
+      rocket.y += rocket.vy;
+      rocket.x += Math.sin(performance.now() * 0.01) * 0.5;
+
+      for (let i = 0; i < 4; i++) {
+        rocketTrail.push(new TrailParticle(rocket.x, rocket.y + 24));
+      }
+
+      if (rocket.y < h * 0.28) {
+        rocket.active = false;
+        createRocketExplosion(rocket.x, rocket.y);
+        startState("band");
+      }
+    }
+
+    function updateRocketTrail() {
+      for (let i = rocketTrail.length - 1; i >= 0; i--) {
+        rocketTrail[i].update();
+        if (rocketTrail[i].life <= 0) rocketTrail.splice(i, 1);
+      }
+    }
+
+    function drawRocketTrail() {
+      for (const p of rocketTrail) p.draw();
+    }
+
+    function updateSparks() {
+      for (let i = sparks.length - 1; i >= 0; i--) {
+        sparks[i].update();
+        if (sparks[i].life <= 0) sparks.splice(i, 1);
+      }
+    }
+
+    function drawSparks() {
+      for (const s of sparks) s.draw();
+    }
+
+    function updateConfetti() {
+      for (let i = confetti.length - 1; i >= 0; i--) {
+        confetti[i].update();
+        if (confetti[i].life <= 0 || confetti[i].y > h + 30) confetti.splice(i, 1);
+      }
+    }
+
+    function drawConfetti() {
+      for (const c of confetti) c.draw();
+    }
+
+    function drawGlowLine(x1, y1, x2, y2, color, width = 3) {
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+      ctx.shadowColor = color;
+      ctx.shadowBlur = 10;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    }
+
+    function drawGlowCircle(x, y, r, fill, blur = 12) {
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fillStyle = fill;
+      ctx.shadowColor = fill;
+      ctx.shadowBlur = blur;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+
+    function drawStageFloor(cx, cy) {
+      ctx.beginPath();
+      ctx.ellipse(cx, cy + 55, 180, 28, 0, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(255,170,70,0.08)";
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.ellipse(cx, cy + 55, 130, 18, 0, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(255,255,255,0.06)";
+      ctx.fill();
+    }
+
+    function drawEarth(x, y, angle) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(angle);
+
+      drawGlowCircle(0, 0, 26, "rgba(90,170,255,0.95)", 16);
+
+      ctx.strokeStyle = "rgba(255,255,255,0.35)";
+      ctx.lineWidth = 1.5;
+
+      ctx.beginPath();
+      ctx.arc(0, 0, 26, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 26, 10, 0, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 14, 26, 0, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.fillStyle = "rgba(100,255,160,0.85)";
+      ctx.beginPath();
+      ctx.ellipse(-8, -2, 7, 4, 0.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.ellipse(9, 6, 8, 5, -0.3, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function drawPerformerHead(x, y, color) {
+      drawGlowCircle(x, y, 10, color, 14);
+    }
+
+    function drawGuitarist(x, y, t) {
+      const sway = Math.sin(t * 0.12) * 6;
+      const arm = Math.sin(t * 0.22) * 10;
+      const leg = Math.cos(t * 0.18) * 8;
+
+      drawPerformerHead(x, y - 62 + sway * 0.15, "rgba(255,225,170,0.98)");
+      drawGlowLine(x, y - 52, x, y - 10, "rgba(255,255,255,0.92)", 4);
+
+      drawGlowLine(x, y - 40, x - 24, y - 18 + arm * 0.2, "rgba(255,120,190,0.92)", 3);
+      drawGlowLine(x, y - 40, x + 24, y - 18 - arm * 0.2, "rgba(255,210,90,0.95)", 3);
+
+      drawGlowLine(x, y - 10, x - 18 - leg * 0.2, y + 22, "rgba(255,255,255,0.92)", 3);
+      drawGlowLine(x, y - 10, x + 18 + leg * 0.2, y + 22, "rgba(255,255,255,0.92)", 3);
+
+      ctx.save();
+      ctx.translate(x + 18, y - 22);
+      ctx.rotate(-0.45 + Math.sin(t * 0.12) * 0.08);
+
+      ctx.beginPath();
+      if (ctx.roundRect) {
+        ctx.roundRect(-10, -16, 20, 32, 8);
+      } else {
+        ctx.rect(-10, -16, 20, 32);
+      }
+      ctx.fillStyle = "rgba(255,150,70,0.95)";
+      ctx.shadowColor = "rgba(255,150,70,0.7)";
+      ctx.shadowBlur = 16;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      drawGlowLine(0, -18, 0, -44, "rgba(255,235,180,0.9)", 4);
+
+      for (let i = -6; i <= 6; i += 4) {
+        drawGlowLine(i, -14, i, 14, "rgba(255,255,255,0.35)", 1);
+      }
+      ctx.restore();
+    }
+
+    function drawDancer(x, y, t) {
+      const bounce = Math.sin(t * 0.18) * 10;
+      const armSwing = Math.sin(t * 0.22) * 24;
+      const legSwing = Math.sin(t * 0.22 + Math.PI / 2) * 18;
+      const bodyY = y + bounce;
+
+      drawPerformerHead(x, bodyY - 58, "rgba(255,240,180,0.98)");
+      drawGlowLine(x, bodyY - 48, x, bodyY - 4, "rgba(255,255,255,0.92)", 4);
+
+      drawGlowLine(
+        x, bodyY - 34,
+        x - 26 - armSwing * 0.35, bodyY - 18 + Math.sin(t * 0.2) * 8,
+        "rgba(255,120,190,0.92)", 3
+      );
+      drawGlowLine(
+        x, bodyY - 34,
+        x + 26 + armSwing * 0.35, bodyY - 18 - Math.sin(t * 0.2) * 8,
+        "rgba(255,210,90,0.95)", 3
+      );
+
+      drawGlowLine(
+        x, bodyY - 4,
+        x - 20 - legSwing * 0.25, bodyY + 28,
+        "rgba(255,255,255,0.92)", 3
+      );
+      drawGlowLine(
+        x, bodyY - 4,
+        x + 20 + legSwing * 0.25, bodyY + 28,
+        "rgba(255,255,255,0.92)", 3
+      );
+
+      ctx.beginPath();
+      ctx.ellipse(x, bodyY + 36, 42, 10, 0, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(255,180,70,0.12)";
+      ctx.fill();
+    }
+
+    function drawSinger(x, y, t) {
+      const sway = Math.sin(t * 0.15 + 1.2) * 7;
+      const arm = Math.sin(t * 0.2 + 0.8) * 8;
+      const micPulse = 1 + Math.sin(t * 0.28) * 0.08;
+
+      drawPerformerHead(x, y - 62 + sway * 0.15, "rgba(255,225,170,0.98)");
+      drawGlowLine(x, y - 52, x, y - 10, "rgba(255,255,255,0.92)", 4);
+
+      drawGlowLine(x, y - 40, x - 20, y - 18 + arm * 0.2, "rgba(255,120,190,0.92)", 3);
+      drawGlowLine(x, y - 40, x + 12, y - 28, "rgba(255,210,90,0.95)", 3);
+
+      drawGlowLine(x, y - 10, x - 14 - sway * 0.15, y + 22, "rgba(255,255,255,0.92)", 3);
+      drawGlowLine(x, y - 10, x + 14 + sway * 0.15, y + 22, "rgba(255,255,255,0.92)", 3);
+
+      drawGlowLine(x + 18, y - 42, x + 18, y + 12, "rgba(220,220,255,0.8)", 2.5);
+      drawGlowCircle(x + 18, y - 46, 6 * micPulse, "rgba(180,220,255,0.95)", 12);
+
+      for (let i = 0; i < 3; i++) {
+        const ox = x + 28 + i * 10;
+        const oy = y - 52 - i * 6;
+        ctx.beginPath();
+        ctx.arc(ox, oy, 2 + i, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,255,255,${0.18 - i * 0.04})`;
+        ctx.fill();
+      }
+    }
+
+    function drawBand() {
+      if (!stage.active) return;
+
+      const t = stage.t;
+      const cx = stage.centerX();
+      const cy = stage.centerY();
+
+      drawStageFloor(cx, cy);
+
+      const leftX = cx - Math.min(140, w * 0.18);
+      const centerX = cx;
+      const rightX = cx + Math.min(140, w * 0.18);
+
+      drawEarth(cx, cy - 145, earth.angle);
+      drawGuitarist(leftX, cy, t);
+      drawDancer(centerX, cy, t);
+      drawSinger(rightX, cy, t);
+    }
+
+    function updateBand() {
+      if (!stage.active) return;
+      stage.t += 1;
+      earth.angle += 0.03;
+
+      if (Math.random() < 0.45) {
+        const cx = stage.centerX();
+        const cy = stage.centerY();
+        const rx = (Math.random() - 0.5) * 260;
+        const ry = (Math.random() - 0.5) * 120;
+        sparks.push(new Spark(cx + rx, cy - 40 + ry, Math.random() > 0.5 ? "gold" : "pink"));
+      }
+    }
+
+    function showFlash() {
+      flash.style.opacity = "1";
+      setTimeout(() => {
+        flash.style.opacity = "0";
+      }, 180);
+    }
+
+    async function playMusic() {
+      try {
+        bgMusic.pause();
+        bgMusic.currentTime = 0;
+        bgMusic.volume = 1.0;
+        await bgMusic.play();
+      } catch (err) {
+        console.log("Music play blocked or failed:", err);
+      }
+    }
+
+    function stopMusic() {
+      bgMusic.pause();
+      bgMusic.currentTime = 0;
+    }
+
+    function startState(next) {
+      effectState = next;
+      stateStart = performance.now();
+
+      if (next === "burst") {
+        label.style.opacity = "1";
+        showFlash();
+        createBurst(w / 2, h * 0.72, 160);
+      }
+
+      if (next === "rocket") {
+        rocket.active = true;
+        rocket.x = w / 2;
+        rocket.y = h + 80;
+      }
+
+      if (next === "band") {
+        stage.active = true;
+        stage.t = 0;
+      }
+
+      if (next === "ending") {
+        stage.active = false;
+        label.style.opacity = "0";
+        stopMusic();
+      }
+    }
+
+    function triggerEffect() {
+      if (effectState !== "idle") return;
+
+      sparks = [];
+      rocketTrail = [];
+      confetti = [];
+      stage.active = false;
+      rocket.active = false;
+      earth.angle = 0;
+
+      playMusic();
+      startState("burst");
+    }
+
+    function updateEffectTimeline(now) {
+      const elapsed = now - stateStart;
+
+      if (effectState === "burst" && elapsed > 900) {
+        startState("rocket");
+      } else if (effectState === "band" && elapsed > 4200) {
+        startState("ending");
+      } else if (effectState === "ending" && elapsed > 900) {
+        effectState = "idle";
+      }
+    }
+
+    function drawBackground() {
+      ctx.fillStyle = "rgba(0,0,0,0.22)";
       ctx.fillRect(0, 0, w, h);
 
       for (const p of bgParticles) p.update();
       drawBgConnections();
       for (const p of bgParticles) p.draw();
+    }
 
-      for (const p of textParticles) p.update(time);
-      for (const p of heartParticles) p.update(time);
+    function animate(now = 0) {
+      drawBackground();
 
-      drawTextConnections(textParticles, 22, "white");
-      drawTextConnections(heartParticles, 24, "heart");
+      updateSparks();
+      drawSparks();
 
-      for (const p of textParticles) p.draw();
-      for (const p of heartParticles) p.draw();
+      updateRocket();
+      updateRocketTrail();
+      drawRocketTrail();
+      drawRocket();
+
+      updateConfetti();
+      drawConfetti();
+
+      updateBand();
+      drawBand();
+
+      updateEffectTimeline(now);
 
       requestAnimationFrame(animate);
     }
 
-    function init() {
-      buildTextParticles();
-      buildBgParticles();
-    }
+    triggerBtn.addEventListener("click", triggerEffect);
 
-    window.addEventListener("mousemove", (e) => {
-      mouse.x = e.clientX;
-      mouse.y = e.clientY;
+    window.addEventListener("resize", () => {
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+      initBgParticles();
     });
 
-    window.addEventListener("mouseleave", () => {
-      mouse.x = -9999;
-      mouse.y = -9999;
-    });
-
-    window.addEventListener("touchmove", (e) => {
-      if (e.touches && e.touches.length > 0) {
-        mouse.x = e.touches[0].clientX;
-        mouse.y = e.touches[0].clientY;
-      }
-    }, { passive: true });
-
-    window.addEventListener("touchend", () => {
-      mouse.x = -9999;
-      mouse.y = -9999;
-    });
-
-    window.addEventListener("resize", resizeCanvas);
-
-    init();
+    initBgParticles();
     animate();
   </script>
 </body>
